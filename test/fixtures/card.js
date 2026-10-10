@@ -7,7 +7,17 @@ export function sampleCard(date) {
     summary: 'Sample summary.',
     passed_on: 'Sample passed-on note.',
     sources: [{ title: 'Example', url: 'https://example.com/' }],
+    guide: {
+      racing: [{ course: 'Ascot', country: 'GB', going: 'Good', races: [{ time_uk: '13:30', name: 'Sample Handicap', runners: 12 }] }],
+      fights: [{ sport: 'boxing', event: 'Sample Fight Night', date, time_uk: '19:00', venue: 'O2', main_event: 'A v B' }],
+    },
     bets: [
+      {
+        id: `${date}-enter`, tier: 'enter', title: 'Sample free bet', sport: 'football', bet_type: 'single',
+        legs: [leg('Chelsea v Bournemouth', 'FREEPICK Chelsea to win', '4/6')],
+        odds: '4/6', decimal_odds: 1.67, value_case: 'v', check: 'c',
+        stake_pts: 1, result: 'pending', profit_pts: null, settled_note: null,
+      },
       {
         id: `${date}-cmd`, tier: 'cmd', title: 'Sample CMD', sport: 'football', bet_type: 'bet_builder',
         legs: [leg('Arsenal v Leeds', 'Arsenal to win', '1/2'), leg('Arsenal v Leeds', 'SECRET Saka 1+ shot on target', '4/9')],

@@ -57,8 +57,10 @@ test("non-members see today's bets locked, with no selections in the response", 
   assert.equal(r.status, 200);
   assert.equal(r.body.locked, true);
   assert.equal(r.body.member, false);
-  assert.equal(r.body.card.bets.length, 2);
-  assert.equal(r.body.card.bets[0].legs_count, 2);
+  const paid = r.body.card.bets.filter((b) => b.tier !== 'enter');
+  assert.equal(paid.length, 2);
+  assert.ok(paid.every((b) => b.locked));
+  assert.equal(paid[0].legs_count, 2);
   const raw = JSON.stringify(r.body);
   assert.doesNotMatch(raw, /SECRET|Sample summary|value case/i);
 });

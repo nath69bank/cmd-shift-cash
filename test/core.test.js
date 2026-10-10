@@ -50,7 +50,7 @@ test('finaliseBets keeps one bet per tier inside its band and stamps stakes', ()
 });
 
 test('Telegram posts escape HTML; teasers hide selections', () => {
-  const [, cash] = sampleCard('2026-10-11').bets;
+  const cash = sampleCard('2026-10-11').bets.find((b) => b.tier === 'cash');
   const full = formatBet(cash, 'https://example.com/?date=2026-10-11');
   assert.match(full, /Sample &lt;CASH&gt; &amp; co/);
   assert.match(full, /SECRET D to win/);

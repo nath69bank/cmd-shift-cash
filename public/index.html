@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CMD + SHIFT + CASH</title>
-  <meta name="description" content="AI-researched value bets for football, horse racing, UFC and boxing. Three tiers every day: CMD around 4/1, SHIFT 20/1+, CASH 100/1+.">
+  <meta name="description" content="Today's fixtures, race times and fight cards, a free safe bet every day, and AI-researched value bets across football, racing, UFC and boxing. Every result tracked in public.">
   <meta name="theme-color" content="#0a0c0b">
   <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,9 +19,12 @@
         <span class="keys" aria-hidden="true"><kbd>⌘</kbd><kbd>⇧</kbd><kbd class="cash">$</kbd></span>
         <span class="wordmark">CMD + SHIFT + <b>CASH</b></span>
       </a>
-      <nav class="nav">
-        <a href="#today">Today</a>
-        <a href="#record">Record</a>
+      <nav class="nav" aria-label="Sections">
+        <a href="#fixtures">Fixtures</a>
+        <a href="#free">Free bet</a>
+        <a href="#tips">Tips</a>
+        <a href="#results">Results</a>
+        <a href="#tools">Tools</a>
         <a href="#join" class="join-link" id="nav-join">Join</a>
         <button type="button" class="ghost" id="nav-account" hidden>Account</button>
       </nav>
@@ -32,47 +35,55 @@
 
   <main>
     <section class="hero wrap">
-      <p class="eyebrow">AI-researched value bets</p>
-      <h1>The shortcut to <span class="hl">value</span>.</h1>
-      <p class="lede">Every day we research football, horse racing, UFC and boxing, and post a bet only where the price beats the real chance. There are three tiers, one for each key.</p>
-      <div class="tiers">
-        <article class="tier tier-cmd">
-          <kbd>⌘</kbd>
-          <div>
-            <h2>CMD <span>· Small</span></h2>
-            <p class="target">around 4/1</p>
-            <p>The controlled one. A short acca, bet builder or single. Stake 1pt.</p>
-          </div>
-        </article>
-        <article class="tier tier-shift">
-          <kbd>⇧</kbd>
-          <div>
-            <h2>SHIFT <span>· Medium</span></h2>
-            <p class="target">20/1+</p>
-            <p>Shifts the bank. Accas and builders where the numbers stack up. Stake 0.5pt.</p>
-          </div>
-        </article>
-        <article class="tier tier-cash">
-          <kbd class="cash">$</kbd>
-          <div>
-            <h2>CASH <span>· Gamble</span></h2>
-            <p class="target">100/1+</p>
-            <p>The big swing, only when every leg has a reason. Stake 0.25pt.</p>
-          </div>
-        </article>
+      <div class="hero-copy">
+        <p class="eyebrow">Football · Racing · UFC · Boxing</p>
+        <h1>The shortcut to <span class="hl">value</span>.</h1>
+        <p class="lede">Today's fixtures and race times, a free safe bet every day, and AI-researched value bets for members. Every bet is fingerprinted when it's posted and tracked in public, wins and losses.</p>
+        <div class="hero-cta">
+          <a class="primary" href="#free">Today's free bet</a>
+          <a class="ghost" href="#join">Go premium</a>
+          <a class="ghost" id="free-tg" href="#" target="_blank" rel="noopener" hidden>Free Telegram</a>
+        </div>
       </div>
-      <ul class="sports" aria-label="Sports covered">
-        <li>Football accas &amp; bet builders</li><li>Horse racing</li><li>UFC / MMA</li><li>Boxing</li>
+      <ul class="keyrow" aria-label="Tiers">
+        <li class="t-enter"><kbd>⏎</kbd><b>ENTER</b><span>Free · evens–2/1</span></li>
+        <li class="t-cmd"><kbd>⌘</kbd><b>CMD</b><span>Small · ~4/1</span></li>
+        <li class="t-shift"><kbd>⇧</kbd><b>SHIFT</b><span>Medium · 20/1+</span></li>
+        <li class="t-cash"><kbd class="cash">$</kbd><b>CASH</b><span>Gamble · 100/1+</span></li>
       </ul>
     </section>
 
-    <section class="wrap section" id="today" aria-labelledby="today-h">
+    <!-- FIXTURES -->
+    <section class="wrap section" id="fixtures" aria-labelledby="fx-h">
       <div class="section-head">
-        <h2 id="today-h">The card</h2>
-        <label class="picker">
-          <span class="sr-only">Choose a day</span>
-          <select id="date"></select>
-        </label>
+        <h2 id="fx-h">Fixtures &amp; times</h2>
+        <span class="muted small" id="fx-updated"></span>
+      </div>
+      <div class="controls">
+        <div class="tabs" role="tablist" aria-label="Sport">
+          <button role="tab" aria-selected="true" data-sport="football">Football</button>
+          <button role="tab" aria-selected="false" data-sport="racing">Racing</button>
+          <button role="tab" aria-selected="false" data-sport="fights">UFC &amp; Boxing</button>
+        </div>
+        <div class="days" id="fx-days" aria-label="Day"></div>
+      </div>
+      <div id="fx-body" class="fx-body" aria-live="polite"></div>
+    </section>
+
+    <!-- FREE BET -->
+    <section class="wrap section" id="free" aria-labelledby="free-h">
+      <div class="section-head">
+        <h2 id="free-h"><kbd class="h-key">⏎</kbd> Free bet of the day</h2>
+        <label class="picker"><span class="sr-only">Choose a day</span><select id="date"></select></label>
+      </div>
+      <div id="free-bet" class="bets"></div>
+    </section>
+
+    <!-- PAID TIPS -->
+    <section class="wrap section" id="tips" aria-labelledby="tips-h">
+      <div class="section-head">
+        <h2 id="tips-h">Premium tips</h2>
+        <span class="muted small">CMD · SHIFT · CASH</span>
       </div>
       <p class="card-summary" id="card-summary"></p>
       <div id="bets" class="bets"></div>
@@ -86,21 +97,74 @@
       </details>
     </section>
 
-    <section class="wrap section" id="record" aria-labelledby="record-h">
-      <div class="section-head"><h2 id="record-h">Track record</h2><span class="muted small">Settled bets, level stakes in points</span></div>
+    <!-- RESULTS -->
+    <section class="wrap section" id="results" aria-labelledby="results-h">
+      <div class="section-head">
+        <h2 id="results-h">Results, in public</h2>
+        <button type="button" class="ghost small-btn" id="csv">Download CSV</button>
+      </div>
       <div class="stats" id="stats"></div>
+      <figure class="chart-card">
+        <figcaption>
+          <span class="chart-title">Running profit, all tiers</span>
+          <span class="muted small">Points, level stakes · settled bets only</span>
+        </figcaption>
+        <div class="chart" id="chart"></div>
+      </figure>
+      <div class="table-wrap">
+        <table class="results" id="results-table">
+          <thead>
+            <tr><th>Date</th><th>Tier</th><th>Bet</th><th class="num">Odds</th><th class="num">Stake</th><th>Result</th><th class="num">P/L</th><th>Fingerprint</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <details class="panel">
+        <summary>How we keep score</summary>
+        <ul>
+          <li>Every bet is saved and posted with a time stamp before the first event starts. Bets are never edited afterwards; only the result is added.</li>
+          <li>Each bet gets a <b>fingerprint</b> (SHA-256 of its selections and prices), shown publicly while the selections are still locked. After the event, press <b>Check</b> to recompute it in your browser from the published bet. A match proves nothing was changed.</li>
+          <li>Profit is in points at the posted price: CMD 1pt, SHIFT 0.5pt, CASH 0.25pt, ENTER 1pt. Voids return the stake.</li>
+          <li>Losing bets stay on the record, the same as winners.</li>
+        </ul>
+      </details>
     </section>
 
+    <!-- TOOLS -->
+    <section class="wrap section" id="tools" aria-labelledby="tools-h">
+      <div class="section-head"><h2 id="tools-h">Free tools</h2></div>
+      <div class="tools">
+        <form class="tool" id="calc" autocomplete="off">
+          <h3>Acca calculator</h3>
+          <p class="muted small">Enter fractional (5/2), decimal (3.5) or US (+250) odds.</p>
+          <ol class="calc-legs" id="calc-legs"></ol>
+          <div class="row">
+            <button type="button" class="ghost" id="calc-add">+ Add leg</button>
+            <label class="stake">Stake £<input id="calc-stake" type="number" min="0" step="0.5" value="5" inputmode="decimal"></label>
+          </div>
+          <dl class="calc-out" id="calc-out"></dl>
+        </form>
+        <form class="tool" id="conv" autocomplete="off">
+          <h3>Odds converter</h3>
+          <p class="muted small">Type any format and see the others, plus the chance the price implies.</p>
+          <input id="conv-in" class="big-input" value="5/2" aria-label="Odds">
+          <dl class="calc-out" id="conv-out"></dl>
+          <p class="muted small">If you rate a bet's chance above its implied probability, that's value. It's how every tip here is chosen.</p>
+        </form>
+      </div>
+    </section>
+
+    <!-- JOIN -->
     <section class="wrap section" id="join" aria-labelledby="join-h">
       <div class="join" id="join-box">
         <div>
           <p class="eyebrow">Premium</p>
           <h2 id="join-h">Get every bet the moment it's posted.</h2>
           <ul class="ticks">
-            <li>Today's CMD, SHIFT and CASH bets in full on the site</li>
-            <li>The private Telegram group, with each bet posted as it's found</li>
-            <li>Every leg's reasoning, the value case, and what to check before you place it</li>
-            <li>Every result settled and tracked, wins and losses</li>
+            <li>CMD, SHIFT and CASH bets every day, in full</li>
+            <li>The private Telegram group, with bets posted as they're found</li>
+            <li>Every leg's reasoning, the value case, and what to check before you place</li>
+            <li>The free bet, fixtures, tools and full results stay free for everyone</li>
           </ul>
         </div>
         <div class="join-cta">
@@ -137,7 +201,7 @@
     <div class="wrap">
       <p><strong>18+ only. Please gamble responsibly.</strong> These are opinions based on research, not guarantees, and prices move. Most bets lose, longer prices more often. Only stake what you can afford to lose.</p>
       <p>Free, confidential help: <a href="https://www.begambleaware.org/" rel="noopener">BeGambleAware.org</a> · National Gambling Helpline 0808 8020 133 · <a href="https://www.gamstop.co.uk/" rel="noopener">GAMSTOP</a> self-exclusion</p>
-      <p class="muted small">© CMD + SHIFT + CASH</p>
+      <p class="muted small">Fixtures data: ESPN. Times are UK. © CMD + SHIFT + CASH</p>
     </div>
   </footer>
 

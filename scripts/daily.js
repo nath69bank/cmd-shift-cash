@@ -95,7 +95,8 @@ async function pick() {
   const link = SITE ? `${SITE}/?date=${date}` : null;
   for (const bet of card.bets) {
     await post(PREMIUM, formatBet(bet, link));
-    await post(FREE, formatTeaser(bet, SITE));
+    // The free ENTER bet goes out in full everywhere; paid tiers get a teaser.
+    await post(FREE, TIERS[bet.tier].free ? formatBet(bet, link) : formatTeaser(bet, SITE));
   }
 }
 

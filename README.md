@@ -1,12 +1,22 @@
 # CMD + SHIFT + CASH ⌘ ⇧ $
 
-AI-researched value bets for **football, horse racing, UFC/MMA and boxing**. Every day it posts up to three bets, one per key:
+AI-researched value bets for **football, horse racing, UFC/MMA and boxing**, with a free fixtures board, free tools, a free bet every day, and a fully public results record.
 
-| Key | Tier | Price | Stake |
-|---|---|---|---|
-| ⌘ **CMD** | Small | around 4/1 (3/1 to 6/1) | 1pt |
-| ⇧ **SHIFT** | Medium | 20/1+ | 0.5pt |
-| $ **CASH** | Gamble | 100/1+ | 0.25pt |
+| Key | Tier | Price | Stake | Who sees it |
+|---|---|---|---|---|
+| ⏎ **ENTER** | Free | evens to 2/1 | 1pt | everyone (site + free Telegram) |
+| ⌘ **CMD** | Small | around 4/1 (3/1 to 6/1) | 1pt | members |
+| ⇧ **SHIFT** | Medium | 20/1+ | 0.5pt | members |
+| $ **CASH** | Gamble | 100/1+ | 0.25pt | members |
+
+## Free for everyone (the lead magnet)
+- **Fixtures & times:** live times and scores for the Premier League, Champions League, Championship, LaLiga, Serie A, Bundesliga, Ligue 1, Scottish Premiership and Europa League (ESPN's public feed, no key needed), plus upcoming UFC cards. UK and Irish race meetings with every race time, and boxing cards, are added by the daily research run.
+- **ENTER:** one safe bet a day, in full.
+- **Tools:** an acca returns calculator and an odds converter (fractional, decimal, US, implied chance).
+- **Results:** every bet ever posted, wins and losses, with points P/L per tier, a running-profit chart and a CSV download. Today's paid bets show as locked rows until the day is over.
+
+## Proving the record is honest
+Every bet gets a **fingerprint** when it's posted: a SHA-256 hash of its selections and prices (`public/assets/proof.js`). The fingerprint is shown publicly straight away, on the locked card, in the results table and in the Telegram posts, while the selections are still hidden. After the event, the bet is revealed and anyone can press **Check** to recompute the hash in their browser. If someone had edited the bet afterwards, the hash wouldn't match. Bets are never edited; settlement only adds the result.
 
 A tier is only posted when the research finds value (estimated chance higher than the price implies). Bets outside a tier's price band are rejected automatically.
 
@@ -23,7 +33,9 @@ GitHub Action (08:15 UTC daily)
 
 Website (Vercel)
   public/          the site
-  api/card.js      today's bets: full for members, locked teasers for everyone else; past days public (track record)
+  api/card.js      the day's bets: ENTER and past days public; today's paid tiers locked for non-members
+  api/results.js   every bet ever posted, for the public results table and chart
+  api/fixtures.js  football (ESPN), UFC (ESPN), racing and boxing (daily research run); CDN-cached 2 min
   api/checkout.js  Stripe Checkout (subscription)
   api/auth.js      sign-in after checkout, email sign-in links, sign out, Stripe billing portal
   api/telegram.js  members get a single-use 24-hour invite link to the premium group
@@ -45,6 +57,7 @@ Membership is an active Stripe subscription. There's no database: the member coo
 | `SESSION_SECRET` | a random string, 32+ characters (`openssl rand -hex 32`) |
 | `SITE_URL` | e.g. `https://cmdshiftcash.com` |
 | `PRICE_LABEL` | shown on the site, e.g. `£19.99/month` |
+| `TELEGRAM_FREE_URL` | public invite link to your free Telegram channel (shows a "Free Telegram" button) |
 | `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID` | see step 2 |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_PREMIUM_CHAT_ID` | see step 3 (for member invite links) |
 | `RESEND_API_KEY`, `EMAIL_FROM` | see step 4 |
@@ -85,6 +98,7 @@ ANTHROPIC_API_KEY=... npm run daily -- --no-post      # real research run, saved
 - Stripe: per-transaction fees; Resend: free tier
 
 ## Things to know
+- **Fixtures feed:** ESPN's scoreboard API is public but unofficial. It's fine to get going, but for a commercial site consider a licensed feed (e.g. API-Football or football-data.org); only `lib/fixtures.js` needs to change.
 - **Bets are posted, not placed.** Bookmakers don't offer APIs for placing bets on personal accounts. The service researches, builds and publishes the bet, and members place it themselves.
 - **Prices are estimates** from previews at research time. Each bet says what to check (team sheets, non-runners, weigh-ins).
 - **Lapsed members in Telegram:** invite links are single-use and expire after 24 hours, but members who cancel stay in the group until removed. Prune the group manually for now.
