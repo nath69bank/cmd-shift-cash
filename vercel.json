@@ -3,7 +3,7 @@
   "outputDirectory": "public",
   "functions": {
     "api/*.js": {
-      "maxDuration": 15
+      "maxDuration": 20
     }
   },
   "headers": [
@@ -27,6 +27,90 @@
           "value": "max-age=63072000; includeSubDomains"
         }
       ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, stale-while-revalidate=86400"
+        }
+      ]
     }
-  ]
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/api/page?p=home"
+    },
+    {
+      "source": "/free-bet-today",
+      "destination": "/api/page?p=free"
+    },
+    {
+      "source": "/tips",
+      "destination": "/api/page?p=tips"
+    },
+    {
+      "source": "/fixtures",
+      "destination": "/api/page?p=fixtures"
+    },
+    {
+      "source": "/racing",
+      "destination": "/api/page?p=racing"
+    },
+    {
+      "source": "/fights",
+      "destination": "/api/page?p=fights"
+    },
+    {
+      "source": "/results",
+      "destination": "/api/page?p=results"
+    },
+    {
+      "source": "/tools",
+      "destination": "/api/page?p=tools"
+    },
+    {
+      "source": "/faq",
+      "destination": "/api/page?p=faq"
+    },
+    {
+      "source": "/join",
+      "destination": "/api/page?p=join"
+    },
+    {
+      "source": "/previews",
+      "destination": "/api/page?p=previews"
+    },
+    {
+      "source": "/terms",
+      "destination": "/api/page?p=terms"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/api/page?p=privacy"
+    },
+    {
+      "source": "/responsible-gambling",
+      "destination": "/api/page?p=responsible"
+    },
+    {
+      "source": "/fixtures/:league",
+      "destination": "/api/page?p=fixtures&league=:league"
+    },
+    {
+      "source": "/previews/:d",
+      "destination": "/api/page?p=preview&d=:d"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/page?p=sitemap"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/api/page?p=robots"
+    }
+  ],
+  "cleanUrls": true
 }

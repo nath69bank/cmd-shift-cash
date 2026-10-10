@@ -9,8 +9,11 @@
 
 import { parseArgs } from 'node:util';
 import { getDayContext } from '../lib/fpl.js';
-import { pickBets, settleBets } from '../lib/tips.js';
-import { getCard, getIndex, saveCard } from '../lib/store.js';
+import { pickBets, settleBets, writePreview } from '../lib/tips.js';
+import { getCard, getIndex, getPreview, saveCard, savePreview } from '../lib/store.js';
+import { bookmakers } from '../lib/data.js';
+import { listSubscribers, unsubscribeToken } from '../lib/subscribers.js';
+import { sendBankerEmails } from '../lib/email.js';
 import { formatBet, formatResults, formatTeaser, sendMessage } from '../lib/telegram.js';
 import { TIERS } from '../lib/brand.js';
 import { ukDate } from '../lib/dates.js';
@@ -92,12 +95,33 @@ async function pick() {
     return;
   }
   console.log(`${date}: posted ${card.bets.map((b) => `${TIERS[b.tier].name} ${b.odds}`).join(', ')}`);
-  const link = SITE ? `${SITE}/?date=${date}` : null;
+  const books = bookmakers();
   for (const bet of card.bets) {
-    await post(PREMIUM, formatBet(bet, link));
+    const link = SITE ? `${SITE}${TIERS[bet.tier].free ? '/free-bet-today' : '/tips'}` : null;
+    await post(PREMIUM, formatBet(bet, link, books));
     // The free ENTER bet goes out in full everywhere; paid tiers get a teaser.
-    await post(FREE, TIERS[bet.tier].free ? formatBet(bet, link) : formatTeaser(bet, SITE));
+    await post(FREE, TIERS[bet.tier].free ? formatBet(bet, link, books) : formatTeaser(bet, SITE ? `${SITE}/join` : null));
   }
+
+  const banker = card.bets.find((b) => TIERS[b.tier].free);
+  if (banker && SITE && !opts['no-post']) {
+    try {
+      const sent = await sendBankerEmails(await listSubscribers(), banker, SITE, unsubscribeToken);
+      console.log(`Banker emailed to ${sent} subscribers.`);
+    } catch (e) {
+      console.error(`Banker email failed: ${e.message}`);
+    }
+  }
+}
+
+// Fridays: the weekend preview article for the site (and a link on Telegram).
+async function preview() {
+  const weekday = new Date(`${date}T12:00:00Z`).getUTCDay();
+  if (weekday !== 5 || (!opts.force && (await getPreview(date)))) return;
+  const p = await writePreview(date);
+  await savePreview(p);
+  console.log(`${date}: weekend preview published (${p.sections.length} sections).`);
+  if (SITE) await post(FREE, `📰 <b>${p.title.replace(/[<>&]/g, '')}</b>\n${SITE}/previews/${date}`);
 }
 
 if (!opts['skip-settle']) {
@@ -110,3 +134,9 @@ if (!opts['skip-settle']) {
   }
 }
 await pick();
+try {
+  await preview();
+} catch (e) {
+  console.error(`Weekend preview failed: ${e.message}`);
+  process.exitCode = 1;
+}

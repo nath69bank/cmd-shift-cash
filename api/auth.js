@@ -23,6 +23,12 @@ export default async function handler(req, res) {
   const { action, session_id, token } = query(req);
   const base = siteUrl(req);
   try {
+    // Lightweight check the pages use to switch to the member view.
+    if (req.method === 'GET' && action === 'me') {
+      const member = await currentMember(req).catch(() => null);
+      return json(res, 200, { member: Boolean(member) }, member?.setCookie ? { 'Set-Cookie': member.setCookie } : {});
+    }
+
     // Back from Stripe Checkout.
     if (req.method === 'GET' && action === 'return' && session_id) {
       const cid = await customerFromCheckout(session_id);

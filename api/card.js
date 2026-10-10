@@ -1,10 +1,10 @@
 import { json, query } from '../lib/http.js';
 import { getCard, getIndex } from '../lib/store.js';
 import { currentMember } from '../lib/members.js';
-import { record } from '../lib/odds.js';
-import { TIER_ORDER } from '../lib/brand.js';
-import { isLocked, teaser } from '../lib/visibility.js';
+import { bookmakers, trackRecord, visibleCard } from '../lib/data.js';
 
+// A day's card as this visitor may see it, plus the track record. The pages
+// call this to unlock the premium bets for signed-in members.
 export default async function handler(req, res) {
   if (req.method !== 'GET') return json(res, 405, { error: 'method_not_allowed' });
   try {
@@ -13,36 +13,16 @@ export default async function handler(req, res) {
     const dates = index.cards.map((c) => c.date);
     const wanted = query(req).date;
     const date = dates.includes(wanted) ? wanted : dates[0];
-
-    const all = index.cards.flatMap((c) => c.bets);
-    const track = {
-      overall: record(all),
-      tiers: Object.fromEntries(TIER_ORDER.map((t) => [t, record(all.filter((b) => b.tier === t))])),
-    };
     const base = {
       dates,
       member: Boolean(member),
-      record: track,
+      record: trackRecord(index),
       price_label: process.env.PRICE_LABEL || null,
       free_telegram_url: process.env.TELEGRAM_FREE_URL || null,
+      bookmakers: bookmakers(),
     };
-    if (!date) return json(res, 200, { ...base, date: null, card: null }, headers);
-
-    const card = await getCard(date);
-    if (!card) return json(res, 200, { ...base, date: null, card: null }, headers);
-    const bets = card.bets.map((b) => (isLocked(b.tier, date, member) ? teaser(b) : b));
-    const locked = bets.some((b) => b.locked);
-    const body = locked
-      ? { date, generated_at: card.generated_at, bets }
-      : {
-          date,
-          generated_at: card.generated_at,
-          summary: card.summary,
-          passed_on: card.passed_on,
-          sources: card.sources,
-          bets,
-        };
-    return json(res, 200, { ...base, date, locked, card: body }, headers);
+    const card = date ? visibleCard(await getCard(date), member) : null;
+    return json(res, 200, { ...base, date: card ? date : null, locked: card?.locked ?? false, card }, headers);
   } catch (e) {
     console.error('card', e);
     return json(res, 500, { error: 'unavailable' });

@@ -1,105 +1,105 @@
 # CMD + SHIFT + CASH ⌘ ⇧ $
 
-AI-researched value bets for **football, horse racing, UFC/MMA and boxing**, with a free fixtures board, free tools, a free bet every day, and a fully public results record.
+AI-researched value bets for **football, horse racing, UFC/MMA and boxing**. Everything that brings people in is free (fixtures, race times, a daily banker, tools, the full results record), and the premium tips sit behind a paywall.
 
 | Key | Tier | Price | Stake | Who sees it |
 |---|---|---|---|---|
-| ⏎ **ENTER** | Free | evens to 2/1 | 1pt | everyone (site + free Telegram) |
-| ⌘ **CMD** | Small | around 4/1 (3/1 to 6/1) | 1pt | members |
+| ⏎ **ENTER** | Banker | evens to 2/1 | 1pt | everyone (site, email, free Telegram) |
+| ⌘ **CMD** | Small | around 4/1 | 1pt | members |
 | ⇧ **SHIFT** | Medium | 20/1+ | 0.5pt | members |
 | $ **CASH** | Gamble | 100/1+ | 0.25pt | members |
 
-## Free for everyone (the lead magnet)
-- **Fixtures & times:** live times and scores for the Premier League, Champions League, Championship, LaLiga, Serie A, Bundesliga, Ligue 1, Scottish Premiership and Europa League (ESPN's public feed, no key needed), plus upcoming UFC cards. UK and Irish race meetings with every race time, and boxing cards, are added by the daily research run.
-- **ENTER:** one safe bet a day, in full.
-- **Tools:** an acca returns calculator and an odds converter (fractional, decimal, US, implied chance).
-- **Results:** every bet ever posted, wins and losses, with points P/L per tier, a running-profit chart and a CSV download. Today's paid bets show as locked rows until the day is over.
-
-## Proving the record is honest
-Every bet gets a **fingerprint** when it's posted: a SHA-256 hash of its selections and prices (`public/assets/proof.js`). The fingerprint is shown publicly straight away, on the locked card, in the results table and in the Telegram posts, while the selections are still hidden. After the event, the bet is revealed and anyone can press **Check** to recompute the hash in their browser. If someone had edited the bet afterwards, the hash wouldn't match. Bets are never edited; settlement only adds the result.
-
 A tier is only posted when the research finds value (estimated chance higher than the price implies). Bets outside a tier's price band are rejected automatically.
 
-## How it works
+## The site
 
+Every page is rendered on the server with its content in the HTML, so search engines can index it. A small script then adds live scores, member unlocks, the chart and the tools.
+
+| Page | What's on it | Search terms it targets |
+|---|---|---|
+| `/` | Banker, locked premium tips, today's football, record, email sign-up, FAQ, join | brand, "betting tips today" |
+| `/free-bet-today` | The banker in full, banker results, email sign-up | "free bet today", "banker of the day" |
+| `/tips` | Today's premium bets (locked teasers for non-members) | "betting tips today", "acca tips" |
+| `/fixtures`, `/fixtures/<league>` | Kick-off times and live scores, 🔒 badges on games in a premium bet | "premier league fixtures today", etc. |
+| `/racing` | UK and Irish meetings, going, race times, next-race countdown | "racing today", "race times today" |
+| `/fights` | UFC and boxing cards this week | "UFC tonight", "boxing this weekend" |
+| `/results` | Every bet, P/L by tier, chart, monthly table, CSV, fingerprint check | "tipster results" |
+| `/tools` | Acca calculator, odds converter | "acca calculator", "odds converter" |
+| `/previews` | Friday weekend preview articles | "weekend football preview" |
+| `/faq`, `/join`, `/terms`, `/privacy`, `/responsible-gambling` | | |
+
+Also: `sitemap.xml`, `robots.txt`, canonical URLs, Open Graph / Twitter share cards (`public/og.png`), and structured data (WebSite, Organization, FAQPage, SportsEvent lists, Article).
+
+**Conversion:** sticky "🔒 N premium bets today · Unlock" bar on mobile, email capture for the daily banker, optional Stripe free trial, the track record next to every Join button, and tip badges on fixtures.
+
+**Compliance:** 18+ confirmation on first visit, terms, privacy and responsible-gambling pages, essential cookies only, affiliate disclosures, and "Banker" wording instead of "safe bet" (no bet is safe; UK ad rules frown on it).
+
+## Proving the record is honest
+Every bet gets a **fingerprint** when it's posted: a SHA-256 hash of its selections and prices (`public/assets/proof.js`). It's shown publicly straight away, on the locked card, in the results table and in Telegram, while the selections are still hidden. After the event anyone can press **Check** to recompute it in their browser. If the bet had been edited, the hash wouldn't match.
+
+## The daily run
 ```
-GitHub Action (08:15 UTC daily)
-  └─ scripts/daily.js
-       1. Settle: earlier pending bets → Claude checks results → won/lost/void/placed → results posted to Telegram
-       2. Pick:   FPL feed (Premier League fixtures + player stats) + Claude web research
-                  (team news, line-ups, racecards, fight cards, Opta / Racing Post / UFC Stats…)
-                  → up to 3 bets → saved to private Vercel Blob storage
-       3. Post:   full bets → premium Telegram group; teasers (tier, price, no selections) → free channel
-
-Website (Vercel)
-  public/          the site
-  api/card.js      the day's bets: ENTER and past days public; today's paid tiers locked for non-members
-  api/results.js   every bet ever posted, for the public results table and chart
-  api/fixtures.js  football (ESPN), UFC (ESPN), racing and boxing (daily research run); CDN-cached 2 min
-  api/checkout.js  Stripe Checkout (subscription)
-  api/auth.js      sign-in after checkout, email sign-in links, sign out, Stripe billing portal
-  api/telegram.js  members get a single-use 24-hour invite link to the premium group
+GitHub Action, 08:15 UTC daily → scripts/daily.js
+  1. Settle earlier pending bets (Claude checks results) → post results to Telegram
+  2. Research today's value bets + racecards + fight cards → save (private Vercel Blob)
+  3. Post: full bets to the premium Telegram group; the banker in full + paid teasers to the free channel
+  4. Email the banker to subscribers (Resend, one-click unsubscribe)
+  5. Fridays: write and publish the weekend preview article
 ```
 
-Membership is an active Stripe subscription. There's no database: the member cookie is signed with `SESSION_SECRET` and re-checked with Stripe when the paid period ends.
-
-**This repo is public**, so bets never go in git. They're stored in a *private* Vercel Blob store, and the Action logs show only tiers and prices.
+## Affiliate links (how to get them)
+1. **Apply to bookmaker partner programmes.** The main UK ones: bet365 Partners, Flutter Partners (Sky Bet, Paddy Power, Betfair), William Hill Affiliates, Betfred Partners, BetVictor Partners, Kindred/Unibet Affiliates. Networks such as Income Access manage several brands. Each programme reviews your site: having the legal pages, 18+ check and a public record helps.
+2. **Read their compliance rules.** UK affiliates must follow the CAP/BCAP gambling rules and the operator's licence conditions: 18+ messaging, "T&Cs apply", no appeal to under-18s, offers worded exactly as the bookmaker's terms.
+3. **Paste your tracking links into `config/bookmakers.js`** (`url`, and optionally `offer`), then commit. The "Place it at" buttons appear on the banker and on members' bets, and in Telegram posts. They're marked `rel="sponsored"` with the 18+ / T&Cs / commission line. Empty URLs stay hidden.
 
 ## Setup
 
-### 1. Vercel (site + storage)
-1. Import this repo into Vercel. No build settings are needed (`vercel.json` serves `public/` and `api/`).
-2. Go to **Storage → Create → Blob** and pick **private** access. Connect it to the project; this adds `BLOB_READ_WRITE_TOKEN`.
-3. Add environment variables:
+### 1. Vercel
+Import this repo. Under **Storage**, create a **private Blob** store and connect it (adds `BLOB_READ_WRITE_TOKEN`). Environment variables:
 
 | Variable | What |
 |---|---|
-| `SESSION_SECRET` | a random string, 32+ characters (`openssl rand -hex 32`) |
-| `SITE_URL` | e.g. `https://cmdshiftcash.com` |
-| `PRICE_LABEL` | shown on the site, e.g. `£19.99/month` |
-| `TELEGRAM_FREE_URL` | public invite link to your free Telegram channel (shows a "Free Telegram" button) |
-| `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID` | see step 2 |
-| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_PREMIUM_CHAT_ID` | see step 3 (for member invite links) |
-| `RESEND_API_KEY`, `EMAIL_FROM` | see step 4 |
+| `SESSION_SECRET` | random, 32+ characters (`openssl rand -hex 32`) |
+| `SITE_URL` | e.g. `https://cmdshiftcash.com` (used for canonical URLs and links) |
+| `PRICE_LABEL` | e.g. `£19.99/month` |
+| `TRIAL_DAYS` | optional, e.g. `7` for a free trial on Stripe Checkout |
+| `TELEGRAM_FREE_URL` | public invite link to your free channel |
+| `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID` | Stripe secret key and monthly price ID |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_PREMIUM_CHAT_ID` | for member invite links |
+| `RESEND_API_KEY`, `EMAIL_FROM` | sign-in links |
+| `BUSINESS_NAME`, `CONTACT_EMAIL` | shown on the terms and privacy pages |
+| `TIP_BADGES` | set to `0` to hide 🔒 badges on fixtures |
 
-### 2. Stripe (payments)
-1. Create a product, "CMD + SHIFT + CASH Premium", with a recurring monthly price. Copy the price ID (`price_…`) into `STRIPE_PRICE_ID`.
-2. Copy your secret key into `STRIPE_SECRET_KEY`.
-3. Turn on the **Customer portal** (Settings → Billing → Customer portal) so members can cancel or update their card.
+### 2. Stripe
+Create a product with a monthly price and turn on the Customer portal (Settings → Billing → Customer portal).
 
 ### 3. Telegram
-1. Message **@BotFather**, send `/newbot`, and copy the token into `TELEGRAM_BOT_TOKEN`.
-2. Create a **private group** for premium members. Add the bot as an **admin** with "Invite users via link" turned on.
-3. Optional: create a **public channel** for free teasers and results. Add the bot as an admin with "Post messages" turned on.
-4. Get each chat ID: post a message in the chat, open `https://api.telegram.org/bot<TOKEN>/getUpdates`, and copy `chat.id` (it starts with `-100`). These are `TELEGRAM_PREMIUM_CHAT_ID` and `TELEGRAM_FREE_CHAT_ID`.
+Create a bot with @BotFather. Make it an admin of a **private premium group** (with "Invite users via link") and of a **public free channel** (with "Post messages"). Get each chat ID from `https://api.telegram.org/bot<TOKEN>/getUpdates` (it starts with `-100`).
 
-### 4. Email sign-in links (Resend)
-Sign up at resend.com, verify your domain, and set `RESEND_API_KEY` and `EMAIL_FROM` (e.g. `CMD + SHIFT + CASH <bets@yourdomain.com>`).
+### 4. Resend
+Verify your domain at resend.com; set `RESEND_API_KEY` and `EMAIL_FROM`.
 
-### 5. GitHub Action (the daily run)
-In this repo, go to **Settings → Secrets and variables → Actions** and add:
-- Secrets: `ANTHROPIC_API_KEY`, `BLOB_READ_WRITE_TOKEN` (the same token Vercel shows), `TELEGRAM_BOT_TOKEN`, `TELEGRAM_PREMIUM_CHAT_ID`, `TELEGRAM_FREE_CHAT_ID`
+### 5. GitHub Actions (the daily run)
+In this repo, go to **Settings → Secrets and variables → Actions**:
+- Secrets: `ANTHROPIC_API_KEY`, `BLOB_READ_WRITE_TOKEN`, `SESSION_SECRET` (same as Vercel), `TELEGRAM_BOT_TOKEN`, `TELEGRAM_PREMIUM_CHAT_ID`, `TELEGRAM_FREE_CHAT_ID`, `RESEND_API_KEY`, `EMAIL_FROM`
 - Variable: `SITE_URL`
 
-Test it from **Actions → Daily bets → Run workflow**. Scheduled runs only fire from the default branch.
+Test with **Actions → Daily bets → Run workflow**.
+
+### 6. Google
+Add the site in **Google Search Console**, verify the domain, and submit `https://<your-domain>/sitemap.xml`. A custom domain ranks far better than `*.vercel.app`.
 
 ## Local preview
-
 ```bash
 npm install
-npm test                                              # offline, no keys needed
-SESSION_SECRET=$(openssl rand -hex 32) npm run dev    # http://localhost:3000, cards read from ./.data
+npm test
+SESSION_SECRET=$(openssl rand -hex 32) npm run dev    # http://localhost:3000, data from ./.data
 ANTHROPIC_API_KEY=... npm run daily -- --no-post      # real research run, saved to ./.data, nothing posted
 ```
 
-## Running costs (rough)
-- Claude: about $1–3 a day (one research run plus one settlement run, each with web search)
-- Vercel Hobby, Blob, GitHub Actions, Telegram: free at this scale
-- Stripe: per-transaction fees; Resend: free tier
-
 ## Things to know
-- **Fixtures feed:** ESPN's scoreboard API is public but unofficial. It's fine to get going, but for a commercial site consider a licensed feed (e.g. API-Football or football-data.org); only `lib/fixtures.js` needs to change.
-- **Bets are posted, not placed.** Bookmakers don't offer APIs for placing bets on personal accounts. The service researches, builds and publishes the bet, and members place it themselves.
-- **Prices are estimates** from previews at research time. Each bet says what to check (team sheets, non-runners, weigh-ins).
-- **Lapsed members in Telegram:** invite links are single-use and expire after 24 hours, but members who cancel stay in the group until removed. Prune the group manually for now.
-- **UK rules:** paid tipping services must follow the CAP Code (no "guaranteed winners", clear 18+ messaging, no appeal to under-18s). If you add bookmaker affiliate links, the bookmaker's licence conditions apply to you too. Take advice before launch.
+- **Fixtures feed:** ESPN's scoreboard API is public but unofficial. For a commercial site consider a licensed feed (API-Football, football-data.org); only `lib/fixtures.js` changes.
+- **Bets are posted, not placed.** Bookmakers don't offer APIs for placing bets on personal accounts.
+- **Prices are estimates** from research time; each bet says what to check before placing.
+- **Lapsed members in Telegram** stay in the group until removed; prune it manually for now.
+- **Legal pages are a starting point.** Have the terms and privacy policy reviewed before you take payments.

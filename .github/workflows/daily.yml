@@ -2,8 +2,9 @@ name: Daily bets
 
 on:
   schedule:
-    # 08:15 UTC every day (09:15 UK summer time): settles yesterday, then posts
-    # today's bets before the first races and the 12:30 kick-off.
+    # 08:15 UTC every day (09:15 UK summer time): settles yesterday, posts
+    # today's bets and emails the banker; on Fridays also writes the weekend
+    # preview.
     - cron: '15 8 * * *'
   workflow_dispatch:
     inputs:
@@ -45,6 +46,9 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_PREMIUM_CHAT_ID: ${{ secrets.TELEGRAM_PREMIUM_CHAT_ID }}
           TELEGRAM_FREE_CHAT_ID: ${{ secrets.TELEGRAM_FREE_CHAT_ID }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           SITE_URL: ${{ vars.SITE_URL }}
           DATE: ${{ inputs.date }}
           FORCE: ${{ inputs.force }}
